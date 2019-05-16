@@ -2,9 +2,6 @@
 using CentralServiceAPI.web.Notification.Models;
 using Microsoft.Extensions.Configuration;
 using ServiceReference1;
-using System;
-using System.ServiceModel;
-using System.Xml;
 
 namespace CentralServiceAPI.web.Notification.Orchestrations
 {

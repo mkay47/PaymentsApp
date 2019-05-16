@@ -1,6 +1,7 @@
 ﻿using CentralService.Admin.Models;
 using CentralService.Helper;
 using Dapper;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System;
@@ -13,18 +14,22 @@ namespace CentralService.Admin.Orchestration
 {
     public class UserOrchestration : IUserOrchestration
     {
-        private readonly AppSettings _appSettings;
+        private readonly JWTSettings _JWTSettings;
+        private readonly IConfiguration _Config;
+        private readonly string ConnectionString;
 
-        public UserOrchestration(IOptions<AppSettings> appSettings)
+        public UserOrchestration(IOptions<JWTSettings> jwtSettings,IConfiguration config)
         {
-            _appSettings = appSettings.Value;
+            _JWTSettings = jwtSettings.Value;
+            _Config = config;
+            ConnectionString = _Config.GetConnectionString("PaymentsServiceDBConnectionString");
         }
 
         public User GetUser(User user)
         {
             string sql = "SELECT * FROM ServiceUser WHERE (Username = @Username) and (Password = @Password) ;";
 
-            using (var connection = new SqlConnection(@"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=PaymentsServiceDB;Integrated Security=True"))
+            using (var connection = new SqlConnection(ConnectionString))
             {
                 var result = connection.QuerySingle<User>(sql, new { user.Username, user.Password });
 
@@ -38,16 +43,19 @@ namespace CentralService.Admin.Orchestration
 
                 // authentication successful so generate jwt token
                 var tokenHandler = new JwtSecurityTokenHandler();
-                var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
+                var key = Encoding.ASCII.GetBytes(_JWTSettings.SecretKey);
                 var tokenDescriptor = new SecurityTokenDescriptor
                 {
-                    Subject = new ClaimsIdentity(new Claim[]
-                    {
-                    new Claim(ClaimTypes.Name, user.Username.ToString())
-                    }),
+                    Subject = new ClaimsIdentity(
+                        new Claim[]
+                        {
+                            new Claim(ClaimTypes.Name, user.Username.ToString())
+                        }
+                    ),
                     Expires = DateTime.UtcNow.AddDays(7),
                     SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
                 };
+
                 var token = tokenHandler.CreateToken(tokenDescriptor);
 
                 user.Token = tokenHandler.WriteToken(token);
@@ -60,7 +68,7 @@ namespace CentralService.Admin.Orchestration
         {
             string sql = "SELECT * FROM ServiceUser WHERE AccountNumber = @Account;";
 
-            using (var connection = new SqlConnection(@"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=PaymentsServiceDB;Integrated Security=True"))
+            using (var connection = new SqlConnection(ConnectionString))
             {
                 var result = connection.QuerySingle<User>(sql, new { sell.Account });
 
@@ -72,7 +80,7 @@ namespace CentralService.Admin.Orchestration
         {
             string sql = "SELECT * FROM ServiceUser WHERE AccountNumber = @Account;";
 
-            using (var connection = new SqlConnection(@"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=PaymentsServiceDB;Integrated Security=True"))
+            using (var connection = new SqlConnection(ConnectionString))
             {
                 var result = connection.QuerySingle<User>(sql, new { Account = merchant });
 

@@ -1,4 +1,5 @@
-﻿using NotificationServiceAPI.Models;
+﻿using NotificationServiceAPI.Admin;
+using NotificationServiceAPI.Models;
 using RestSharp;
 using System;
 using System.Configuration;
@@ -10,10 +11,14 @@ namespace NotificationServiceAPI.Orchestration
     public class NotificationOrchestration : INotificationOrchestration
     {
         private readonly string _ApiSecretKey;
+        private readonly AdminModel _Admin;
 
         public NotificationOrchestration()
         {
             _ApiSecretKey = ConfigurationManager.AppSettings["api_secret"];
+            _Admin.Email = ConfigurationManager.AppSettings["admin_email"];
+            _Admin.Password = ConfigurationManager.AppSettings["admin_paswsord"];
+            _Admin.MailServer = ConfigurationManager.AppSettings["mail_host"];
         }
 
         public SendEmailResponse SendEmail(SendEmailRequest request)
@@ -25,7 +30,7 @@ namespace NotificationServiceAPI.Orchestration
             try
             {
                 // Credentials
-                var credentials = new NetworkCredential("noreply@blessence.co.za", "Password1*");
+                var credentials = new NetworkCredential(_Admin.Email,_Admin.Password);
 
                 // Mail message
                 var mail = new MailMessage()
@@ -42,7 +47,7 @@ namespace NotificationServiceAPI.Orchestration
                     Port = 587,
                     DeliveryMethod = SmtpDeliveryMethod.Network,
                     UseDefaultCredentials = false,
-                    Host = "mail.blessence.co.za",
+                    Host = _Admin.MailServer,
                     EnableSsl = true,
                     Credentials = credentials
                 };

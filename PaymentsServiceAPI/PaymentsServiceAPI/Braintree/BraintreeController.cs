@@ -45,7 +45,7 @@ namespace TestPaymentAPI.Controllers
                 }
             };
 
-            var res = JsonConvert.SerializeObject(request);
+            //var res = JsonConvert.SerializeObject(request);
 
             Result<Transaction> result = _Gateway.Transaction.Sale(request);
 
