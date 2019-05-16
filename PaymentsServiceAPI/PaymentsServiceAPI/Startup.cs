@@ -27,7 +27,6 @@ namespace PaymentsServiceAPI
         public void ConfigureServices(IServiceCollection services)
         {
             ConfigureInjectedOrchestrations(services);
-            ConfigureInjectedServices(services);
             ConfigureInjectedMappings(services);
 
             services.AddCors(options1 =>
@@ -36,12 +35,13 @@ namespace PaymentsServiceAPI
                     .AllowAnyMethod()
                     .AllowCredentials()
                     .AllowAnyOrigin()
-                    .WithHeaders("Accept", "Content-Type", "Origin", "X-My-Header"));
+                    .AllowAnyHeader());
+                    //.WithHeaders("Accept", "Content-Type", "Origin", "X-My-Header"));
             });
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
-            var appSettingsSection = Configuration.GetSection("AppSettings");
+            var appSettingsSection = Configuration.GetSection("JWTSettings");
             services.Configure<JWTSettings>(appSettingsSection);
 
             // configure jwt authentication
@@ -81,10 +81,6 @@ namespace PaymentsServiceAPI
                     }
                 });
             });
-        }
-
-        public void ConfigureInjectedServices(IServiceCollection services)
-        {
         }
 
         public void ConfigureInjectedMappings(IServiceCollection services)

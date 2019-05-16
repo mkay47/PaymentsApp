@@ -2,11 +2,8 @@
 using CentralService.Admin.Orchestration;
 using CentralServiceAPI.web.Notification.Models;
 using CentralServiceAPI.web.Notification.Orchestrations;
-using Dapper;
 using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Data;
-using System.Data.SqlClient;
 
 namespace CentralService.Admin.Controllers
 {

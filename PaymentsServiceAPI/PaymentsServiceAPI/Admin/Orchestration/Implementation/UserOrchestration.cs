@@ -22,45 +22,53 @@ namespace CentralService.Admin.Orchestration
         {
             _JWTSettings = jwtSettings.Value;
             _Config = config;
-            ConnectionString = _Config.GetConnectionString("PaymentsServiceDBConnectionString");
+            ConnectionString = _Config.GetSection("PaymentsServiceDBConnectionString").Value;
         }
 
         public User GetUser(User user)
         {
-            string sql = "SELECT * FROM ServiceUser WHERE (Username = @Username) and (Password = @Password) ;";
-
-            using (var connection = new SqlConnection(ConnectionString))
+            try
             {
-                var result = connection.QuerySingle<User>(sql, new { user.Username, user.Password });
+                string sql = "SELECT * FROM ServiceUser WHERE (Username = @Username) and (Password = @Password) ;";
 
-                // remove password before returning
-                result.Password = null;
-
-                if (user == null)
+                using (var connection = new SqlConnection(ConnectionString))
                 {
-                    return null;
-                }
+                    var result = connection.QueryFirstOrDefault<User>(sql, new { user.Username, user.Password });
 
-                // authentication successful so generate jwt token
-                var tokenHandler = new JwtSecurityTokenHandler();
-                var key = Encoding.ASCII.GetBytes(_JWTSettings.SecretKey);
-                var tokenDescriptor = new SecurityTokenDescriptor
-                {
-                    Subject = new ClaimsIdentity(
-                        new Claim[]
-                        {
+                    // remove password before returning
+                    result.Password = null;
+
+                    if (user == null)
+                    {
+                        return null;
+                    }
+
+                    // authentication successful so generate jwt token
+                    var tokenHandler = new JwtSecurityTokenHandler();
+                    var key = Encoding.ASCII.GetBytes(_JWTSettings.SecretKey);
+                    var signinCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature);
+                    var tokenDescriptor = new SecurityTokenDescriptor
+                    {
+                        Subject = new ClaimsIdentity(
+                            new Claim[]
+                            {
                             new Claim(ClaimTypes.Name, user.Username.ToString())
-                        }
-                    ),
-                    Expires = DateTime.UtcNow.AddDays(7),
-                    SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-                };
+                            }
+                        ),
+                        Expires = DateTime.UtcNow.AddDays(7),
+                        SigningCredentials = signinCredentials
+                    };
 
-                var token = tokenHandler.CreateToken(tokenDescriptor);
+                    var token = tokenHandler.CreateToken(tokenDescriptor);
 
-                user.Token = tokenHandler.WriteToken(token);
+                    result.Token = tokenHandler.WriteToken(token);
 
-                return result;
+                    return result;
+                }
+            
+            }catch(Exception ex)
+            {
+                return null;
             }
         }
 

@@ -16,9 +16,12 @@ namespace NotificationServiceAPI.Orchestration
         public NotificationOrchestration()
         {
             _ApiSecretKey = ConfigurationManager.AppSettings["api_secret"];
-            _Admin.Email = ConfigurationManager.AppSettings["admin_email"];
-            _Admin.Password = ConfigurationManager.AppSettings["admin_paswsord"];
-            _Admin.MailServer = ConfigurationManager.AppSettings["mail_host"];
+            _Admin = new AdminModel
+            {
+                Email = ConfigurationManager.AppSettings["admin_email"],
+                Password = ConfigurationManager.AppSettings["admin_password"],
+                MailServer = ConfigurationManager.AppSettings["mail_host"]
+            };
         }
 
         public SendEmailResponse SendEmail(SendEmailRequest request)
@@ -30,7 +33,7 @@ namespace NotificationServiceAPI.Orchestration
             try
             {
                 // Credentials
-                var credentials = new NetworkCredential(_Admin.Email,_Admin.Password);
+                var credentials = new NetworkCredential(_Admin.Email, _Admin.Password);
 
                 // Mail message
                 var mail = new MailMessage()

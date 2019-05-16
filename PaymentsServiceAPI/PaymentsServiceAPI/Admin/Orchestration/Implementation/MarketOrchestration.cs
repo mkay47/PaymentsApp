@@ -13,8 +13,8 @@ namespace CentralService.Admin.Orchestration
 
         public MarketOrchestration(IConfiguration config)
         {
-            ConnectionString = _Config.GetConnectionString("PaymentsServiceDBConnectionString");
             _Config = config;
+            ConnectionString = _Config.GetSection("PaymentsServiceDBConnectionString").Value;
         }
 
         public User GetUser(Buy buy)
@@ -37,7 +37,7 @@ namespace CentralService.Admin.Orchestration
                 parameter.Add("@Account", account.AccountInfo);
                 parameter.Add("@Amount", account.Amount);
 
-                var res = connection.Execute("MakePayment", parameter, commandType: CommandType.StoredProcedure);
+                var res = connection.Execute("LoadAccount", parameter, commandType: CommandType.StoredProcedure);
 
                 return res;
             }
@@ -45,7 +45,7 @@ namespace CentralService.Admin.Orchestration
 
         public int MakePayment(Buy buy)
         {
-            using (var connection = new SqlConnection(@"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=PaymentsServiceDB;Integrated Security=True"))
+            using (var connection = new SqlConnection(ConnectionString))
             {
                 var parameter = new DynamicParameters();
                 parameter.Add("@Account", buy.Account);

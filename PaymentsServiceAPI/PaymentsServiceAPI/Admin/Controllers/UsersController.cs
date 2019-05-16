@@ -7,7 +7,7 @@ using System;
 
 namespace CentralService.Admin.Controllers
 {
-    [Authorize]
+    [Authorize,AllowAnonymous]
     [Produces("application/json")]
     [Route("api/[Controller]")]
     public class UsersController : Controller
@@ -28,10 +28,20 @@ namespace CentralService.Admin.Controllers
             {
                 if (!ModelState.IsValid)
                 {
-                    return BadRequest();
+                    return BadRequest("Invalid Client Requests");
+                }
+
+                if(user == null)
+                {
+                    return BadRequest("Invalid CLient Request");
                 }
 
                 var result = _UserOrchestration.GetUser(user);
+
+                if (result == null)
+                {
+                    return Unauthorized();
+                }
 
                 var response = JsonConvert.SerializeObject(result);
 
@@ -41,6 +51,30 @@ namespace CentralService.Admin.Controllers
             {
                 return BadRequest(ex);
             }
+        }
+
+        [Route("authenticate")]
+        [HttpGet]
+        public ActionResult Get(int id)
+        {
+            var message = "Hello Authorized API with ID = " + id;
+            return Ok(message);
+        }
+
+        // PUT api/WebApi/5  
+        [Route("authenticate")]
+        [HttpPut]
+        public ActionResult Put(int id, [FromBody]User user)
+        {
+            return NoContent();
+        }
+
+        // DELETE api/WebApi/5  
+        [Route("authenticate")]
+        [HttpDelete]
+        public ActionResult Delete(int id)
+        {
+            return Ok("Session Expired");
         }
     }
 }

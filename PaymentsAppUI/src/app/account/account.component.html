@@ -1,6 +1,6 @@
 <!-- Basic Test -->
-<ngx-braintree [clientTokenURL]="'https://localhost:44339/api/Braintree/token'"
-               [createPurchaseURL]="'https://localhost:44339/api/Braintree/buy'"
+<ngx-braintree [clientTokenURL]="'http://localhost:62897/api/Braintree/token'"
+               [createPurchaseURL]="'http://localhost:62897/api/Braintree/buy'"
                [chargeAmount]="chargeAmount"
                (paymentStatus)="onPaymentStatus($event)"
                (dropinLoaded)="onDropinLoaded($event)">
