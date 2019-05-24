@@ -1,0 +1,49 @@
+<div class="container">
+  <div class="row">
+
+    <form [formGroup]="buyForm" (ngSubmit)="onSubmit()">
+      <h2>Send</h2>
+      <img *ngIf="loading" src="data:image/gif;base64,R0lGODlhEAAQAPIAAP///wAAAMLCwkJCQgAAAGJiYoKCgpKSkiH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCgAAACwAAAAAEAAQAAADMwi63P4wyklrE2MIOggZnAdOmGYJRbExwroUmcG2LmDEwnHQLVsYOd2mBzkYDAdKa+dIAAAh+QQJCgAAACwAAAAAEAAQAAADNAi63P5OjCEgG4QMu7DmikRxQlFUYDEZIGBMRVsaqHwctXXf7WEYB4Ag1xjihkMZsiUkKhIAIfkECQoAAAAsAAAAABAAEAAAAzYIujIjK8pByJDMlFYvBoVjHA70GU7xSUJhmKtwHPAKzLO9HMaoKwJZ7Rf8AYPDDzKpZBqfvwQAIfkECQoAAAAsAAAAABAAEAAAAzMIumIlK8oyhpHsnFZfhYumCYUhDAQxRIdhHBGqRoKw0R8DYlJd8z0fMDgsGo/IpHI5TAAAIfkECQoAAAAsAAAAABAAEAAAAzIIunInK0rnZBTwGPNMgQwmdsNgXGJUlIWEuR5oWUIpz8pAEAMe6TwfwyYsGo/IpFKSAAAh+QQJCgAAACwAAAAAEAAQAAADMwi6IMKQORfjdOe82p4wGccc4CEuQradylesojEMBgsUc2G7sDX3lQGBMLAJibufbSlKAAAh+QQJCgAAACwAAAAAEAAQAAADMgi63P7wCRHZnFVdmgHu2nFwlWCI3WGc3TSWhUFGxTAUkGCbtgENBMJAEJsxgMLWzpEAACH5BAkKAAAALAAAAAAQABAAAAMyCLrc/jDKSatlQtScKdceCAjDII7HcQ4EMTCpyrCuUBjCYRgHVtqlAiB1YhiCnlsRkAAAOwAAAAAAAAAAAA==" />
+      <app-alert></app-alert>
+      <div class="form-group">
+        <label for="account">Account Number</label>
+        <input type="text" formControlName="account" class="form-control" [ngClass]="{ 'is-invalid': submitted && f.account.errors }" />
+        <div *ngIf="submitted && f.account.errors" class="invalid-feedback">
+          <div *ngIf="f.account.errors.required">Account Number is required</div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="merchant">Merchant Acount Number</label>
+        <input type="text" formControlName="merchant" class="form-control" [ngClass]="{ 'is-invalid': submitted && f.merchant.errors }" />
+        <div *ngIf="submitted && f.merchant.errors" class="invalid-feedback">
+          <div *ngIf="f.merchant.errors.required">Merchant Account Number is required</div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="description">Description</label>
+        <input type="text" formControlName="description" class="form-control" [ngClass]="{ 'is-invalid': submitted && f.description.errors }" />
+        <div *ngIf="submitted && f.description.errors" class="invalid-feedback">
+          <div *ngIf="f.description.errors.required">description is required</div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="reference">Reference</label>
+        <input type="text" formControlName="reference" class="form-control" [ngClass]="{ 'is-invalid': submitted && f.reference.errors }" />
+        <div *ngIf="submitted && f.reference.errors" class="invalid-feedback">
+          <div *ngIf="f.reference.errors.required">Reference is required</div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="amount">Amount</label>
+        <input type="number" formControlName="amount" class="form-control" [ngClass]="{ 'is-invalid': submitted && f.amount.errors }" />
+        <div *ngIf="submitted && f.amount.errors" class="invalid-feedback">
+          <div *ngIf="f.amount.errors.required">Amount is required</div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <button [disabled]="loading" class="btn btn-primary">Buy</button>
+      </div>
+    </form>
+  </div>
+</div>
